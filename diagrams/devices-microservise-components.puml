@@ -1,0 +1,37 @@
+@startuml
+!include ./c4/C4_Component.puml
+AddRelTag("dotted", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DottedLine())
+AddRelTag("dashed", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DashedLine())
+
+Container_Ext(backend_api, "API Gateway", "", "Маршрутизация, проверка токенов")
+Container_Boundary(device_back, "Управление устройствами"){
+  Component(devices, "Регистрация/Удаление устройств", "Component: Регистрация/Удаление устройств", "API: добавить устройство, удалить устройство")
+  Component(telemetry, "Состояние устройств", "Component: Телеметрия", "API получения телеметрии, преобразовывает ответ устройства во внутренний формат ответа, в зависимости от типа устройства, статус")
+  Component(connector, "Связь с устройствами", "Component: Связь с устройствами", "Соединяется с устройствами в зависимости от их типа и настроек")
+  Component(management, "Управление", "Component: Управление", "API для выполнения действия")
+  }
+
+Container_Ext(triggers_back, "Триггеры", "Container: Триггеры", "Работа с триггерами")
+
+Container_Ext(profile_back, "Профиль", "Container: Профиль", "Работа с пользователями и привязкой их устройств")
+Container_Ext(monitoring_back, "Мониторинг", "Container: Мониторинг", "По расписанию инициирует опрос телеметрии устройств, сохраняет результат")
+ContainerDb_Ext(device_db, "DB Управление устройствами", "PostgreSQL", "Справочник устройств, Устройства в системе")
+System_Ext(user_devices, "", "Устройства пользователей")
+
+Rel(profile_back, devices, "Добавление/Удаляет устройства", "HTTPS JSON")
+Rel(monitoring_back, telemetry, "Запрос телеметрии", "HTTPS JSON")
+Rel(connector, user_devices, "Запрос действия, телеметрии, состояния")
+
+Rel(devices, device_db, "данные устройств", "SQL")
+Rel(management, device_db, "Читает справочник устройств", "SQL")
+
+Rel_Neighbor(telemetry, connector,  "Запрос состояния, телеметрии")
+
+Rel_Neighbor(management, connector,  "Запрос действия")
+
+Rel(backend_api, management, "справочник устройств, действие", "HTTPS JSON")
+Rel(backend_api, telemetry, "состояние", "HTTPS JSON")
+Rel(triggers_back, telemetry, "Запрос статуса", "HTTPS JSON")
+Rel(triggers_back, management, "Действие", "HTTPS JSON")
+
+@enduml

@@ -1,0 +1,38 @@
+asyncapi: 2.6.0
+info:
+  title: Telemetry Stream
+  version: 1.0.0
+  description: >
+    Asynchronous delivery of telemetry data from devices.
+    Data is pushed periodically by the telemetry service.
+
+channels:
+  telemetry:
+    description: Shared channel for all telemetry data
+    subscribe:
+      summary: Receive telemetry current state for all devices
+      operationId: receiveTelemetry
+      message:
+        name: TelemetryCurrentState
+        title: Telemetry Current State Message
+        contentType: application/json
+        payload:
+          type: object
+          required:
+            - deviceId
+            - telemetry
+            - timestamp
+          properties:
+            deviceId:
+              type: string
+              format: uuid
+              description: Unique identifier of the device
+            telemetry:
+              type: object
+              description: Device-specific telemetry data
+              example:
+                temperature: 22.5
+            timestamp:
+              type: string
+              format: date-time
+              description: Time of measurement

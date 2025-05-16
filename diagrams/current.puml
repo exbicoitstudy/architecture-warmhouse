@@ -1,0 +1,17 @@
+@startuml
+!include <C4/C4_Context>
+
+Person(usr, "Пользователь", "")
+Person(adm, "Администратор", "")
+
+System_Boundary(c1, "Тёплый дом"){
+    System(app, "Система умного дома", "Монолитное Go-приложение: управление отоплением и мониторинг температуры.")
+}
+
+System_Ext(Actuator, "Actuator", "Устройство пользователя")
+
+Rel(usr, app, "Проверяет и обновляет состояние датчиков", "HTTPS JSON")
+Rel(adm, app, "Регистрирует датчики", "HTTPS JSON")
+Rel(app, Actuator, "Отправляет команды устройству, получает информацию")
+
+@enduml

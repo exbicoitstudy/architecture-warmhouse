@@ -1,0 +1,139 @@
+openapi: 3.0.3
+info:
+  title: Trigger Service API
+  version: 1.0.0
+  description: API for creating and managing triggers for devices.
+
+servers:
+  - url: https://domain/api/v1
+    description: Production Server
+
+paths:
+  /triggers:
+    post:
+      summary: Create a new trigger
+      operationId: createTrigger
+      tags:
+        - Triggers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - deviceId
+                - condition
+                - action
+              properties:
+                deviceId:
+                  type: string
+                  format: uuid
+                  example: "abc123e4-56f7-89ab-cdef-1234567890ab"
+                condition:
+                  type: string
+                  example: ">30.5"
+                  description: Condition at which the trigger should fire
+                action:
+                  type: string
+                  example: "turnOffHeater"
+                  description: Action to perform when trigger fires
+      responses:
+        '201':
+          description: Trigger successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  triggerId:
+                    type: string
+                    format: uuid
+                    example: "def456e4-56f7-89ab-cdef-1234567890cd"
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+
+  /triggers/{triggerId}:
+    put:
+      summary: Update an existing trigger
+      operationId: updateTrigger
+      tags:
+        - Triggers
+      parameters:
+        - name: triggerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - deviceId
+                - condition
+                - action
+              properties:
+                deviceId:
+                  type: string
+                  format: uuid
+                  example: "abc123e4-56f7-89ab-cdef-1234567890ab"
+                condition:
+                  type: string
+                  example: ">30.5"
+                action:
+                  type: string
+                  example: "sendNotification"
+      responses:
+        '200':
+          description: Trigger successfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  triggerId:
+                    type: string
+                    format: uuid
+                    example: "def456e4-56f7-89ab-cdef-1234567890cd"
+                  deviceId:
+                    type: string
+                    format: uuid
+                    example: "abc123e4-56f7-89ab-cdef-1234567890ab"
+                  condition:
+                    type: string
+                    example: ">30.5"
+                  action:
+                    type: string
+                    example: "sendNotification"
+        '400':
+          description: Invalid input
+        '404':
+          description: Trigger not found
+        '500':
+          description: Server error
+
+    delete:
+      summary: Delete a trigger
+      operationId: deleteTrigger
+      tags:
+        - Triggers
+      parameters:
+        - name: triggerId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Trigger successfully deleted
+        '404':
+          description: Trigger not found
+        '500':
+          description: Server error

@@ -1,0 +1,30 @@
+@startuml
+!include ./c4/C4_Component.puml
+AddRelTag("dotted", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DottedLine())
+AddRelTag("dashed", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DashedLine())
+
+Container(backend_api, "API Gateway", "", "Маршрутизация, проверка токенов")
+
+Container_Boundary(profile_back, "Профиль"){
+  Component(profile, "Профиль", "Component: Профиль", "Данные пользователя")
+  Component(devices, "Устройства", "Component: Устройства", "Добавление удаление устройств")
+}
+Container_Ext(device_back, "Управление устройствами", "Микросервис", "Работает с устройствами в зависимости от типа")
+Container_Ext(monitoring_back, "Мониторинг", "Container: Мониторинг", "По расписанию инициирует опрос телеметрии устройств, сохраняет результат")
+
+ContainerDb_Ext(profile_db, "DB Профиля", "PostgreSQL", "Пользователи, Устройства пользователей")
+
+
+Rel(backend_api, profile, "Регистрация,данные пользователя", "HTTPS JSON")
+Rel(backend_api, devices, "устройства пользователя", "HTTPS JSON")
+
+
+
+Rel(profile, profile_db, "Читает и записывает данные пользователя", "SQL")
+Rel(devices, profile_db, "Читает и записывает данные устройств", "SQL")
+
+
+Rel(devices, monitoring_back, "Отправка устройства на мониторинг", "{id_device, id_user, type_device}")
+Rel(devices, monitoring_back, "Удаляет устройство из мониторинга", "{id_device}")
+Rel(devices, device_back, "Добавление/удаление устройства, Состояние устройства", "HTTPS JSON")
+@enduml
