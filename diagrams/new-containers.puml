@@ -9,23 +9,30 @@ Container(front, "Web Application", "Single-Page App", "Фронтенд")
 
 System_Boundary(c0, "Тёплый дом"){
     Container(backend_api, "API Gateway", "", "Маршрутизация, проверка токенов")
+    System_Boundary(users, "Домен пользователи"){
     System_Boundary(profile, "Поддомен профиль"){
         Container(profile_back, "Профиль", "Микросервис", "Работа с пользователями и привязкой их устройств")
         ContainerDb(profile_db, "DB Профиля", "PostgreSQL", "Пользователи, Устройства пользователей")
     }
+    }
+
+    System_Boundary(device_domain, "Домен устройств"){
+
     System_Boundary(device, "Поддомен Управление устройствами"){
-        Container(device_back, "Управление устройствами", "Микросервис", "Работает с устройствами в зависимости от типа, запрашивает телеметрию, отправляет команды, узнает статус устройства, регистрирует все устройства и назначает им ID")
-        ContainerDb(device_db, "DB Управление устройствами", "PostgreSQL", "Справочник устройств, Устройства в системе")
+            Container(device_back, "Управление устройствами", "Микросервис", "Работает с устройствами в зависимости от типа, запрашивает телеметрию, отправляет команды, узнает статус устройства, регистрирует все устройства и назначает им ID")
+            ContainerDb(device_db, "DB Управление устройствами", "PostgreSQL", "Справочник устройств, Устройства в системе")
+        }
+        System_Boundary(monitoring, "Поддомен мониторинг"){
+            Container(monitoring_back, "Мониторинг", "Микросервис", "По расписанию инициирует опрос телеметрии устройств, сохраняет результат")
+            ContainerDb(monitoring_db, "DB Мониторинг", "PostgreSQL", "Справочник устройств, Устройство_мониторинга, Телеметрия")
+        }
+        System_Boundary(triggers, "Поддомен триггеры"){
+            Container(triggers_back, "Триггеры", "Триггеры", "Работа с триггерами")
+            ContainerDb(triggers_db, "DB Триггеры", "PostgreSQL", "Читает и записывает данные триггеров")
+        }
+        ContainerQueue(queue, "Брокер сообщений", "")
     }
-    System_Boundary(monitoring, "Поддомен мониторинг"){
-        Container(monitoring_back, "Мониторинг", "Микросервис", "По расписанию инициирует опрос телеметрии устройств, сохраняет результат")
-        ContainerDb(monitoring_db, "DB Мониторинг", "PostgreSQL", "Справочник устройств, Устройство_мониторинга, Телеметрия")
-    }
-    System_Boundary(triggers, "Поддомен триггеры"){
-        Container(triggers_back, "Триггеры", "Триггеры", "Работа с триггерами")
-        ContainerDb(triggers_db, "DB Триггеры", "PostgreSQL", "Читает и записывает данные триггеров")
-    }
-    ContainerQueue(queue, "Брокер сообщений", "")
+
 }
 System_Ext(user_devices, "", "Устройства пользователей")
 
@@ -50,9 +57,11 @@ Rel_Neighbor(monitoring_back, device_back, "узнать телеметрию у
 
 
 Rel_Neighbor(monitoring_back, queue, "Сообщение о значении телеметрии", "async", $tags="dashed")
-Rel(queue, triggers_back, "Сообщение о значении телеметрии", "async", $tags="dashed")
+Rel_Neighbor(queue, triggers_back, "Сообщение о значении телеметрии", "async", $tags="dashed")
 Rel(backend_api, triggers_back, "настройки триггеров", "HTTPS JSON")
 Rel_Neighbor(triggers_back, device_back, "Запрос действия", "HTTPS JSON")
 
-Rel(device_back, user_devices, "Запрос действия, телеметрии, состояния")
+Rel_Neighbor(device_back,  user_devices, "Запрос  телеметрии, состояния")
+Rel(device_back, queue, "Выполнение действия", "async", $tags="dashed")
+Rel(queue, user_devices, "Выполнение действия", "async", $tags="dashed")
 @enduml

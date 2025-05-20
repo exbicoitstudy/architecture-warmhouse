@@ -7,11 +7,11 @@ AddRelTag("dashed", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $line
 Container_Boundary(monitoring_back, "Мониторинг"){
     Component(telemetry, "Телеметрия", "Component: Телеметрия", "По расписанию запрашивает данные телеметрии и сохраняет в базу, получения телеметрии в зависимости от типа (файлы, цифровые данные)")
  }
-Container_Ext(device_back, "Управление устройствами", "Микросервис", "Работает с устройствами в зависимости от типа")
-Container_Ext(profile_back, "Профиль", "Container: Профиль", "Работа с пользователями и привязкой их устройств")
+Container(device_back, "Управление устройствами", "Микросервис", "Работает с устройствами в зависимости от типа")
+Container(profile_back, "Профиль", "Container: Профиль", "Работа с пользователями и привязкой их устройств")
 
-ContainerDb_Ext(monitoring_db, "DB Мониторинг", "PostgreSQL", "Справочник устройств, Устройство_мониторинга, Телеметрия")
-ContainerQueue_Ext(queue, "Брокер сообщений", "")
+ContainerDb(monitoring_db, "DB Мониторинг", "PostgreSQL", "Справочник устройств, Устройство_мониторинга, Телеметрия")
+ContainerQueue(queue, "Брокер сообщений", "")
 
 Rel(telemetry, monitoring_db, "Данные телеметрии, задач мониторинга, справочника устройств", "SQL")
 Rel(telemetry, device_back, "Запрос телеметрии")

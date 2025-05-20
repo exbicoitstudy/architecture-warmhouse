@@ -9,10 +9,10 @@ Container_Boundary(profile_back, "Профиль"){
   Component(profile, "Профиль", "Component: Профиль", "Данные пользователя")
   Component(devices, "Устройства", "Component: Устройства", "Добавление удаление устройств")
 }
-Container_Ext(device_back, "Управление устройствами", "Микросервис", "Работает с устройствами в зависимости от типа")
-Container_Ext(monitoring_back, "Мониторинг", "Container: Мониторинг", "По расписанию инициирует опрос телеметрии устройств, сохраняет результат")
+Container(device_back, "Управление устройствами", "Микросервис", "Работает с устройствами в зависимости от типа")
+Container(monitoring_back, "Мониторинг", "Container: Мониторинг", "По расписанию инициирует опрос телеметрии устройств, сохраняет результат")
 
-ContainerDb_Ext(profile_db, "DB Профиля", "PostgreSQL", "Пользователи, Устройства пользователей")
+ContainerDb(profile_db, "DB Профиля", "PostgreSQL", "Пользователи, Устройства пользователей")
 
 
 Rel(backend_api, profile, "Регистрация,данные пользователя", "HTTPS JSON")
