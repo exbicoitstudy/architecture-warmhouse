@@ -1,0 +1,99 @@
+openapi: 3.0.3
+info:
+  title: Profile Service API
+  version: 1.0.0
+  description: API for user profiles, registration, and user-owned devices.
+
+servers:
+  - url: https://domain/api/v1
+    description: Production Server
+
+paths:
+  /profile:
+    get:
+      summary: Get current user profile
+      operationId: getCurrentUserProfile
+      tags:
+        - Profile
+      responses:
+        '200':
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  login:
+                    type: string
+                  name:
+                    type: string
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+  /devices:
+    get:
+      summary: Get user's devices
+      operationId: getUserDevices
+      tags:
+        - Devices
+      responses:
+        '200':
+          description: List of user devices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    type:
+                      type: string
+                      example: thermostat
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+    post:
+      summary: Add a new device
+      operationId: addDevice
+      tags:
+        - Devices
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+              properties:
+                type:
+                  type: string
+                  example: thermostat
+      responses:
+        '201':
+          description: Device added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error

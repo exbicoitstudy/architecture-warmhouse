@@ -1,0 +1,41 @@
+@startuml
+package "devices" {
+    class DeviceController {
+        + RegisterDevice(w http.ResponseWriter, r *http.Request)
+        - service: DeviceService
+    }
+
+    class DeviceService {
+        - repo: DeviceRepository
+        - validator: DeviceValidator
+        + RegisterDevice(input: RegisterDeviceInput): (Device, error)
+    }
+
+    interface DeviceRepository {
+        + Save(device: Device): error
+    }
+
+    interface DeviceValidator {
+        + Validate(input: RegisterDeviceInput): error
+    }
+
+    class RegisterDeviceInput {
+        Type: string
+        Data: map[string]interface{}
+    }
+
+    class Device {
+        ID: string
+        Type: string
+        Data: map[string]interface{}
+    }
+
+    DeviceController --> DeviceService : вызывает
+    DeviceService --> DeviceValidator : 1.валидирует
+    DeviceService --> DeviceRepository : 2.сохраняет
+    DeviceService --> Device : 3.создаёт
+    DeviceRepository ..> Device
+    DeviceValidator ..> RegisterDeviceInput : проверяет
+}
+
+@enduml

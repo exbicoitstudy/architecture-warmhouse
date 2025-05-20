@@ -1,0 +1,87 @@
+@startuml
+hide circle
+' === Profile ===
+database "Profile" {
+    entity User {
+      id : UUID <<PK>>
+      login : VARCHAR(255)
+      name : VARCHAR(255)
+      ip : INET
+    }
+
+    entity Device {
+      id : UUID <<PK>>
+      external_device_id : UUID
+      user_id : UUID <<FK>>
+    }
+
+    User ||--o{ Device : "owns"
+}
+
+database "Monitoring" {
+
+    entity DeviceDirectory {
+      type : VARCHAR(50) <<PK>>
+      data_type: VARCHAR(50)
+    }
+    entity Device {
+      id: UUID <<PK>>
+      external_device_id : UUID
+      type : VARCHAR(50)<<FK>>
+    }
+    entity Telemetry {
+      id: UUID <<PK>>
+      device_id : UUID <<FK>>
+      date : timestamp
+    }
+    entity TelemetryValueFile {
+      id: UUID <<PK>>
+      telemetry_id : UUID <<FK>>
+      path : VARCHAR(255)
+    }
+    entity TelemetryValueNumber {
+      id: UUID <<PK>>
+      telemetry_id : UUID <<FK>>
+      value : REAL
+    }
+    DeviceDirectory ||--o{ Device : "defines"
+    Telemetry ||--o{ TelemetryValueFile : "extends"
+    Telemetry ||--o{ TelemetryValueNumber : "extends"
+    Device ||--o{ Telemetry : "records"
+}
+
+database "Devices" {
+    entity DeviceDirectory {
+      type : VARCHAR(50) <<PK>>
+      settings : JSONB
+      actions : JSONB
+    }
+
+    entity Device {
+      id : UUID <<PK>>
+      type : VARCHAR(50) <<FK>>
+    }
+
+     DeviceDirectory ||--o{ Device : "defines"
+}
+
+database "Triggers" {
+    entity Trigger {
+      id: UUID <<PK>>
+      external_device_id : UUID <<FK>>
+      condition : VARCHAR(50)
+      action: VARCHAR(50)
+    }
+}
+
+' Profile.Device.external_device_id → Devices.Device.id
+Profile.Device ..> Devices.Device : external_device_id = id
+
+' Monitoring.Device.external_device_id → Devices.Device.id
+Monitoring.Device ..> Devices.Device : external_device_id = id
+
+' Triggers.Trigger.external_device_id → Devices.Device.id
+Triggers.Trigger ..> Devices.Device : external_device_id = id
+
+
+@enduml

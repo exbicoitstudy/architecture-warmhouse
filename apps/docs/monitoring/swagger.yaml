@@ -1,0 +1,57 @@
+openapi: 3.0.3
+info:
+  title: Monitoring Service API
+  version: 1.0.0
+  description: API for managing devices.
+
+servers:
+  - url: https://domain/api/v1
+    description: Production Server
+
+paths:
+  /monitoring/devices:
+    post:
+      summary: Add a device to monitoring
+      operationId: addDeviceToMonitoring
+      tags:
+        - Monitoring
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - deviceId
+                - deviceType
+              properties:
+                deviceId:
+                  type: string
+                  format: uuid
+                  example: "abc123e4-56f7-89ab-cdef-1234567890ab"
+                deviceType:
+                  type: string
+                  example: "temperature"
+                monitoringSettings:
+                  type: object
+            example:
+              deviceId: "abc123e4-56f7-89ab-cdef-1234567890ab"
+              deviceType: "temperature"
+              monitoringSettings:
+                pollingInterval: 60
+      responses:
+        '201':
+          description: Device successfully added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deviceId:
+                    type: string
+                    format: uuid
+                    example: "abc123e4-56f7-89ab-cdef-1234567890ab"
+        '400':
+          description: Invalid request format
+        '500':
+          description: Internal server error
